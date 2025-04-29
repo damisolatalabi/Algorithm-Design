@@ -150,7 +150,7 @@ class Graph {
             v = Integer.parseInt(parts[1]); 
             wgt = Integer.parseInt(parts[2]);
             
-            System.out.println("Edge " + toChar(u) + "--(" + wgt + ")--" + toChar(v));   
+            System.out.println("Edge " + u + "--(" + wgt + ")--" + v);   
 
            
             
@@ -173,11 +173,7 @@ class Graph {
         }	       
     }
    
-    // convert vertex into char for pretty printing
-    private char toChar(int u)
-    {  
-        return (char)(u + 64);
-    }
+    
     
     // method to display the graph representation
     public void display() {
@@ -185,136 +181,11 @@ class Graph {
         Node n;
         
         for(v=1; v<=V; ++v){
-            System.out.print("\nadj[" + toChar(v) + "] ->" );
+            System.out.print("\nadj[" + v + "] ->" );
             for(n = adj[v]; n != z; n = n.next) 
-                System.out.print(" |" + toChar(n.vert) + " | " + n.wgt + "| ->");    
+                System.out.print(" |" + n.vert + " | " + n.wgt + "| ->");    
         }
         System.out.println("");
-    }
-
-    public void DF(int startVertex){
-        visited = new int [V + 1];// Initialize visited array (indices 1 to V)
-        id = 0;                   // Reset visitation counter
-        System.out.println("\nDFS starting from " + toChar(startVertex));
-        dfVisit(startVertex);     // Begin recursion
-    }
-    
-    // Private recursive DFS helper
-    private void dfVisit(int currentVertex) {
-        visited[currentVertex] = ++id; // Mark as visited
-        System.out.println("  Visited " + toChar(currentVertex) + " (Order #" + id + ")");
-        
-        // Explore all neighbors
-        for (Node neighbor = adj[currentVertex]; neighbor != z; neighbor = neighbor.next) {
-            if (visited[neighbor.vert] == 0) {  // If neighbor is unvisited
-                dfVisit(neighbor.vert);         // Recurse!
-            }
-        }
-    }
-    // breathfrist function
-    public void breadthFirst(int s) {
-        visited = new int[V+1];
-        Queue<Integer> q = new LinkedList<>();
-        id = 0;
-        
-        q.add(s);
-        visited[s] = ++id;
-        
-        System.out.println("\nBFS starting from " + toChar(s));
-        
-        while (!q.isEmpty()) {
-            int v = q.remove();
-            System.out.println("Visited " + toChar(v) + " (order: " + visited[v] + ")");
-            
-            for (Node t = adj[v]; t != z; t = t.next) {
-                if (visited[t.vert] == 0) {
-                    q.add(t.vert);
-                    visited[t.vert] = ++id;
-                }
-            }
-        }
-    }
-
-
-	public void MST_Prim(int s)
-	{
-        int v, u;
-        int wgt, wgt_sum = 0;
-        int[] dist = new int[V+1];    // Minimum edge weight to connect to MST
-        int[] parent = new int[V+1];  // Parent of each vertex in MST
-        int[] hPos = new int[V+1];    // Position of vertex in heap
-        Node t;
-
-        //code here
-        // Initialize
-        for (v = 1; v <= V; v++) {
-            dist[v] = Integer.MAX_VALUE;
-            parent[v] = 0;
-            hPos[v] = 0;
-        }
-        
-        dist[s] = 0;
-        
-        Heap h =  new Heap(V, dist, hPos);
-        h.insert(s);
-        
-        //while ( ...)  
-        //{
-            // most of alg here
-            
-       // }
-        while (!h.isEmpty()) 
-        {
-            u = h.remove();  // Extract vertex with minimum key
-                // Only add vertices to weight sum
-            
-                wgt_sum += dist[u];
-            
-            // Update keys of adjacent vertices
-            for (t = adj[u]; t != z; t = t.next) 
-            {
-                v = t.vert;
-                if (t.wgt < dist[v]) 
-                {  // Found better connection to v
-                    dist[v] = t.wgt;
-                    parent[v] = u;
-                    if (hPos[v] == 0) 
-                    {
-                        h.insert(v);  // New vertex
-                    } else 
-                    {
-                        h.siftUp(hPos[v]);  // Update existing vertex
-                    }
-                }
-            }
-        }
-        mst = parent;  // Store result for showMST()
-        System.out.print("\n\nWeight of MST = " + wgt_sum + "\n");
-        showMST(); 
-
-                  		
-	}
-    
-    public void showMST()
-    {
-            System.out.print("\n\nMinimum Spanning tree parent array is:\n");
-            for(int v = 1; v <= V; ++v)
-            {
-                if (mst[v] != 0) 
-                { // Skip root
-                    System.out.println(toChar(v) + " -> " + toChar(mst[v]) + " (weight: " + getEdgeWeight(mst[v], v) + ")");
-                    System.out.println("");
-                }
-            }
-               
-    }
-    private int getEdgeWeight(int u, int v) {
-        for (Node t = adj[u]; t != z; t = t.next) {
-            if (t.vert == v) {
-                return t.wgt;
-            }
-        }
-        return 0; // Return 0 if edge not found (shouldn't happen in MST)
     }
 
     public void SPT_Dijkstra(int s) 
@@ -356,31 +227,28 @@ class Graph {
     }
     // Display method for SPT
     public void showSPT(int[] dist, int[] parent, int s) {
-        System.out.println("\nShortest Path Tree from source: " + toChar(s));
+        System.out.println("\nShortest Path Tree from source: " + s);
         System.out.println("Vertex\tParent\tDistance");
 
         // Loop through results
         for (int v = 1; v <= V; v++) {
-            System.out.printf("  %c\t  %c\t   %s\n", toChar(v), (v == s) ? '-' : toChar(parent[v]), (dist[v] == Integer.MAX_VALUE) ? "∞" : dist[v]);
-            // toChar(parent[v]) means that if there is no path, print '-' instead
+            System.out.printf("  %d\t  %d\t   %s\n", v, (v == s) ? '-' : parent[v], (dist[v] == Integer.MAX_VALUE) ? "∞" : dist[v]);
+            // parent[v]means that if there is no path, print '-' instead
         }
     } // End Method    
 
 }//END CLASS
 
-public class GraphLists {
+public class DijkstraCA {
     public static void main(String[] args) throws IOException
     {
         int s = 2;
-        String fname = "wGraph1.txt";               
+        String fname = "worldGraph.txt";               
 
         Graph g = new Graph(fname);
        
         g.display();
 
-       g.DF(s);
-       g.breadthFirst(s);
-       g.MST_Prim(s);   
        g.SPT_Dijkstra(s);               
     }
 }//end main
